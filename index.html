@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teacher Assessment (Final Data)</title>
+  <title>Teacher Assessment</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -16,14 +16,7 @@
     .btn-toggle:hover { opacity: 1; transform: translateY(-1px); }
     .btn-pass.active { background-color: #22c55e; border-color: #22c55e; color: white; opacity: 1; }
     .btn-fail.active { background-color: #ef4444; border-color: #ef4444; color: white; opacity: 1; }
-    .a4-container {
-      width: 210mm;
-      min-height: 297mm;
-      background: white;
-      padding: 15mm;
-      margin: 0 auto;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
+    .a4-container { width: 210mm; min-height: 297mm; background: white; padding: 15mm; margin: 0 auto; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
     .avoid-break { page-break-inside: avoid; }
     .badge-pass { color: #166534; background-color: #dcfce7; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #166534; display: inline-block; min-width: 80px; text-align: center; }
     .badge-fail { color: #991b1b; background-color: #fee2e2; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #991b1b; display: inline-block; min-width: 80px; text-align: center; }
@@ -33,7 +26,7 @@
 
 <body class="bg-slate-50 min-h-screen text-slate-800">
 
-  <!-- AUTH PAGE -->
+  <!-- AUTH PAGE (Google only) -->
   <div id="authPage" class="min-h-screen flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center border border-slate-100">
       <div class="mb-6"><span class="bg-indigo-100 text-indigo-600 p-3 rounded-xl text-3xl">⚓</span></div>
@@ -41,25 +34,15 @@
       <p class="text-slate-500 mb-8 text-sm">ระบบประเมินสมรรถนะ (Maritime & Navigation)</p>
 
       <button id="googleLoginBtn"
-        class="w-full flex items-center justify-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition mb-6">
+        class="w-full flex items-center justify-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition">
         เข้าใช้งานด้วย Google
       </button>
-
-      <div class="border-t pt-6">
-        <p class="text-xs font-bold text-slate-400 uppercase mb-2">Admin Access</p>
-        <div class="flex gap-2">
-          <input type="password" id="adminCode"
-            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
-            placeholder="รหัสผ่านผู้ดูแลระบบ">
-          <button id="adminLoginBtn" class="bg-slate-800 hover:bg-black text-white text-sm font-bold py-2 px-4 rounded-lg">Go</button>
-        </div>
-      </div>
 
       <div id="authMessage" class="mt-4 text-red-500 text-sm font-bold"></div>
     </div>
   </div>
 
-  <!-- ✅ PROFILE PAGE (หลัง Sign-in) -->
+  <!-- PROFILE PAGE -->
   <div id="profilePage" class="hidden min-h-screen flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
       <div class="mb-6 text-center">
@@ -223,19 +206,18 @@
           <h3 class="font-bold text-slate-700">คะแนน (ฝั่งคุณ):</h3>
           <span class="text-2xl font-bold text-indigo-600" id="scoreSummary">0/0</span>
         </div>
-        <div class="flex gap-4">
-  <button onclick="saveData()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg">
-    💾 บันทึกผล
-  </button>
 
-  <button onclick="openPreview()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2">
-    <span>🖨️</span> ดูตัวอย่าง PDF
-  </button>
-
-  <button onclick="clearAssessmentData()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-lg shadow-lg">
-    🧹 เคลียร์ผล
-  </button>
-</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button onclick="saveData()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg">
+            💾 บันทึกผล
+          </button>
+          <button onclick="openPreview()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2">
+            <span>🖨️</span> ดูตัวอย่าง PDF
+          </button>
+          <button onclick="clearAssessmentData()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-lg shadow-lg">
+            🧹 เคลียร์ผล
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -303,7 +285,7 @@
     </div>
   </div>
 
-  <!-- ✅ COMMON HELPERS (ต้องอยู่ก่อน script module เพื่อให้ module เรียกใช้ได้) -->
+  <!-- COMMON HELPERS -->
   <script>
     window.currentUser = null;
     window.currentUserProfile = null;
@@ -313,17 +295,13 @@
       document.getElementById(pageId).classList.remove('hidden');
     }
 
-    function getProfileKey(uid) {
-      return `TA_PROFILE_${uid}`;
-    }
+    function getProfileKey(uid) { return `TA_PROFILE_${uid}`; }
 
     function loadProfile(uid) {
       try {
         const raw = localStorage.getItem(getProfileKey(uid));
         return raw ? JSON.parse(raw) : null;
-      } catch {
-        return null;
-      }
+      } catch { return null; }
     }
 
     function saveProfile(uid, profile) {
@@ -335,7 +313,6 @@
       const nameToShow = profile?.fullName || window.currentUser?.displayName || 'User';
       document.getElementById('userDisplay').innerText = nameToShow;
 
-      // ซ่อนเมนูตามบทบาท (ตามที่ขอ: ครูผู้สอน vs ผู้ประเมิน(หัวหน้า))
       const isTeacher = profile?.role === 'teacher';
       const isHead = profile?.role === 'head';
 
@@ -343,38 +320,13 @@
       const btnTeam = document.getElementById('btnTeam');
 
       if (btnSelf && btnTeam) {
-        // ครูผู้สอน: เห็น "ประเมินตนเอง" เท่านั้น
-        // หัวหน้า: เห็น "ประเมินคนในทีม" เท่านั้น
         btnSelf.classList.toggle('hidden', isHead);
         btnTeam.classList.toggle('hidden', isTeacher);
       }
     }
-
-    window.saveProfileAndContinue = () => {
-      const fullName = document.getElementById('profileFullName').value.trim();
-      const role = document.querySelector('input[name="userRole"]:checked')?.value;
-
-      if (!fullName) {
-        document.getElementById('profileMsg').innerText = 'กรุณากรอกชื่อ-นามสกุล';
-        return;
-      }
-      if (!role) {
-        document.getElementById('profileMsg').innerText = 'กรุณาเลือกตำแหน่ง';
-        return;
-      }
-
-      const uid = window.currentUser?.uid || 'admin';
-      const profile = { fullName, role };
-
-      saveProfile(uid, profile);
-      window.currentUserProfile = profile;
-
-      applyProfileToUI();
-      showPage('selectionPage');
-    };
   </script>
 
-  <!-- FIREBASE AUTH -->
+  <!-- FIREBASE AUTH (Google only) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -400,15 +352,13 @@
       if (user) {
         window.currentUser = user;
 
-        // (ตามโค้ดเดิมของคุณ) demo mapping เป็น t1
-        window.currentUser.teacherId = 't1';
+        // ใช้ uid เป็น teacherId (กันชนหลายคน)
+        window.currentUser.teacherId = user.uid;
 
-        // โหลดโปรไฟล์
         const prof = loadProfile(user.uid);
         window.currentUserProfile = prof;
 
         if (!prof) {
-          // เติมค่าเริ่มต้นจาก Google
           document.getElementById('profileFullName').value = user.displayName || '';
           showPage('profilePage');
         } else {
@@ -422,27 +372,7 @@
 
     document.getElementById('googleLoginBtn').addEventListener('click', async () => {
       try { await signInWithPopup(auth, provider); }
-      catch (e) { alert(e.message); }
-    });
-
-    document.getElementById('adminLoginBtn').addEventListener('click', () => {
-      if (document.getElementById('adminCode').value === '28751') {
-        // ✅ admin ก็ต้องผ่าน profile ได้ (หากไม่เคยกรอก)
-        window.currentUser = { uid: 'admin', displayName: 'Administrator', teacherId: 't1' };
-
-        const prof = loadProfile('admin');
-        window.currentUserProfile = prof;
-
-        if (!prof) {
-          document.getElementById('profileFullName').value = 'Administrator';
-          showPage('profilePage');
-        } else {
-          applyProfileToUI();
-          showPage('selectionPage');
-        }
-      } else {
-        document.getElementById('authMessage').innerText = "รหัสผ่านไม่ถูกต้อง";
-      }
+      catch (e) { document.getElementById('authMessage').innerText = e.message; }
     });
 
     window.logout = () => signOut(auth).then(() => location.reload());
@@ -450,58 +380,78 @@
 
   <!-- APP LOGIC -->
   <script>
-    // --- ฐานข้อมูลรายวิชา (แยกเทอม และ Deck ชัดเจน) ---
+    // --- SUBJECT DB ---
     const subjectsDB = {
-      // --- เทอม 1 ---
       '30000-1410': { name: 'คณิตศาสตร์เพื่อการเดินเรือ 1 (30000-1410)', assignedDeck: 'DECK 1 & PCP 4D', competencies: ['การคำนวณตำแหน่งเรือ', 'ตรีโกณมิติทางทะเล', 'การใช้ตารางเดินเรือ'] },
       '30000-1305': { name: 'วิทยาศาสตร์งานอาชีพเครื่องกลฯ (30000-1305)', assignedDeck: 'DECK 1 & PCP 4D', competencies: ['หลักการทางอุณหพลศาสตร์', 'กลศาสตร์ของไหลเบื้องต้น', 'วัสดุศาสตร์ในงานช่าง'] },
-
       'AM-03-MATH': { name: 'AMCOL WAY 03 MATH', assignedDeck: 'DECK 2 & PCP 5D', competencies: ['Calculus Foundation', 'Vector Analysis', 'Matrix & Determinant'] },
       'AM-03-SCI': { name: 'AMCOL WAY 03 SCI', assignedDeck: 'DECK 2 & PCP 5D', competencies: ['Physics for Navigation', 'Wave & Optics', 'Energy Conservation'] },
-
       'AM-05-MATH': { name: 'AMCOL WAY 05 MATH', assignedDeck: 'DECK 3', competencies: ['Advanced Algebra', 'Statistics Probability', 'Complex Numbers'] },
       'AM-05-SCI': { name: 'AMCOL WAY 05 SCI', assignedDeck: 'DECK 3', competencies: ['Chemistry Basic', 'Material Properties', 'Environmental Science'] },
-
       'AM-07-MATH': { name: 'AMCOL WAY 07 MATH', assignedDeck: 'DECK 4', competencies: ['Numerical Method', 'Optimization', 'Spherical Trigonometry'] },
       'AM-07-SCI': { name: 'AMCOL WAY 07 SCI', assignedDeck: 'DECK 4', competencies: ['Modern Physics', 'Astronomy Basic', 'Geology for Sea'] },
-
-      // --- เทอม 2 ---
       '30000-1411': { name: 'คณิตศาสตร์เพื่อการเดินเรือ 2 (30000-1411)', assignedDeck: 'DECK 1 & PCP 4D', competencies: ['ดาราศาสตร์เพื่อการเดินเรือ', 'การคำนวณเวลาและพิกัด', 'Celestial Navigation'] },
       '30000-1312': { name: 'วิทยาศาสตร์เทคโนโลยีการเดินเรือ (30000-1312)', assignedDeck: 'DECK 1 & PCP 4D', competencies: ['สมุทรศาสตร์กายภาพ', 'อุตุนิยมวิทยาทางทะเล', 'คลื่นและกระแสน้ำ'] },
-
       'AM-04-MATH': { name: 'AMCOL WAY 04 MATH', assignedDeck: 'DECK 2 & PCP 5D', competencies: ['Math Logic', 'Set Theory', 'Functions & Graphs'] },
       'AM-04-SCI': { name: 'AMCOL WAY 04 SCI', assignedDeck: 'DECK 2 & PCP 5D', competencies: ['Electricity & Magnetism', 'Circuit Basic', 'Electromagnetic Waves'] },
-
       'AM-06-MATH': { name: 'AMCOL WAY 06 MATH', assignedDeck: 'DECK 3', competencies: ['Calculus II', 'Integration Tech', 'Polar Coordinates'] },
       'AM-06-SCI': { name: 'AMCOL WAY 06 SCI', assignedDeck: 'DECK 3', competencies: ['Fluid Dynamics', 'Thermodynamics II', 'Heat Transfer'] },
-
       'AM-08-MATH': { name: 'AMCOL WAY 08 MATH', assignedDeck: 'DECK 4', competencies: ['Applied Statistics', 'Data Analysis', 'Navigation Math Advanced'] },
       'AM-08-SCI': { name: 'AMCOL WAY 08 SCI', assignedDeck: 'DECK 4', competencies: ['Marine Technology', 'Signal Processing', 'Radio Communication Sci'] }
     };
 
-    // --- ตารางสอนครู (User: t1) ---
+    // --- TEACHERS DB (demo only) ---
     const teachersDB = [
-      {
-        id: 't1',
-        name: 'คุณครู (User)',
-        schedule: {
-          '2567': {
-            '1': ['30000-1410', '30000-1305', 'AM-03-MATH', 'AM-03-SCI', 'AM-05-MATH', 'AM-05-SCI', 'AM-07-MATH', 'AM-07-SCI'],
-            '2': ['30000-1411', '30000-1312', 'AM-04-MATH', 'AM-04-SCI', 'AM-06-MATH', 'AM-06-SCI', 'AM-08-MATH', 'AM-08-SCI']
-          },
-          '2568': {
-            '1': ['30000-1410', '30000-1305', 'AM-03-MATH', 'AM-03-SCI', 'AM-05-MATH', 'AM-05-SCI', 'AM-07-MATH', 'AM-07-SCI'],
-            '2': ['30000-1411', '30000-1312', 'AM-04-MATH', 'AM-04-SCI', 'AM-06-MATH', 'AM-06-SCI', 'AM-08-MATH', 'AM-08-SCI']
-          }
-        }
-      },
       { id: 't2', name: 'หัวหน้าหมวด (Demo)', schedule: { '2567': { '1': ['30000-1410', '30000-1411'] } } }
     ];
 
-    // --- Functions ---
+    // demo schedule for logged-in users (replace with real DB later)
+    const demoScheduleForLoggedInUser = {
+      '2567': {
+        '1': ['30000-1410', '30000-1305', 'AM-03-MATH', 'AM-03-SCI', 'AM-05-MATH', 'AM-05-SCI', 'AM-07-MATH', 'AM-07-SCI'],
+        '2': ['30000-1411', '30000-1312', 'AM-04-MATH', 'AM-04-SCI', 'AM-06-MATH', 'AM-06-SCI', 'AM-08-MATH', 'AM-08-SCI']
+      },
+      '2568': {
+        '1': ['30000-1410', '30000-1305', 'AM-03-MATH', 'AM-03-SCI', 'AM-05-MATH', 'AM-05-SCI', 'AM-07-MATH', 'AM-07-SCI'],
+        '2': ['30000-1411', '30000-1312', 'AM-04-MATH', 'AM-04-SCI', 'AM-06-MATH', 'AM-06-SCI', 'AM-08-MATH', 'AM-08-SCI']
+      }
+    };
+
+    function upsertLoggedInUserToTeachersDB() {
+      if (!window.currentUser) return;
+      const tid = window.currentUser.teacherId || window.currentUser.uid;
+      const name = window.currentUserProfile?.fullName || window.currentUser.displayName || 'User';
+
+      let t = teachersDB.find(x => x.id === tid);
+      if (!t) {
+        teachersDB.push({ id: tid, name, schedule: demoScheduleForLoggedInUser });
+      } else {
+        t.name = name;
+        if (!t.schedule || Object.keys(t.schedule).length === 0) t.schedule = demoScheduleForLoggedInUser;
+      }
+    }
+
+    // save profile (no admin)
+    window.saveProfileAndContinue = () => {
+      const fullName = document.getElementById('profileFullName').value.trim();
+      const role = document.querySelector('input[name="userRole"]:checked')?.value;
+
+      if (!fullName) { document.getElementById('profileMsg').innerText = 'กรุณากรอกชื่อ-นามสกุล'; return; }
+      if (!role) { document.getElementById('profileMsg').innerText = 'กรุณาเลือกตำแหน่ง'; return; }
+
+      const uid = window.currentUser?.uid;
+      const profile = { fullName, role };
+
+      saveProfile(uid, profile);
+      window.currentUserProfile = profile;
+
+      upsertLoggedInUserToTeachersDB();
+      applyProfileToUI();
+      showPage('selectionPage');
+    };
+
     function goBack(target) { showPage(target); }
 
-    // ✅ แสดงรายวิชาตาม ปี/เทอม/ระดับชั้น
     function updateSelfSubjects() {
       const year = document.getElementById('selfYearSelect').value;
       const term = document.getElementById('selfTermSelect').value;
@@ -516,8 +466,9 @@
         return;
       }
 
-      const myId = (window.currentUser && window.currentUser.teacherId) ? window.currentUser.teacherId : 't1';
-      const teacherData = teachersDB.find(t => t.id === myId) || teachersDB.find(t => t.id === 't1');
+      upsertLoggedInUserToTeachersDB();
+      const myId = window.currentUser?.teacherId;
+      const teacherData = teachersDB.find(t => t.id === myId);
 
       if (!teacherData || !teacherData.schedule?.[year]?.[term]) {
         select.innerHTML = '<option value="">ไม่มีข้อมูลในปี/เทอมนี้</option>';
@@ -525,10 +476,7 @@
       }
 
       const allSubjectsInTerm = teacherData.schedule[year][term];
-      const filteredSubjects = allSubjectsInTerm.filter(subID => {
-        const subInfo = subjectsDB[subID];
-        return subInfo && subInfo.assignedDeck === deck;
-      });
+      const filteredSubjects = allSubjectsInTerm.filter(subID => subjectsDB[subID]?.assignedDeck === deck);
 
       if (filteredSubjects.length === 0) {
         select.innerHTML = '<option value="">ไม่มีวิชาในระดับชั้นนี้</option>';
@@ -548,10 +496,8 @@
       window.currentMode = 'self';
       document.getElementById('selfYearSelect').value = '2568';
       document.getElementById('selfTermSelect').value = '2';
-
       document.getElementById('selfClassSelect').value = '';
       updateSelfSubjects();
-
       showPage('selfSelectPage');
     }
 
@@ -560,11 +506,19 @@
       const subj = document.getElementById('selfSubjectSelect').value;
       const year = document.getElementById('selfYearSelect').value;
       const term = document.getElementById('selfTermSelect').value;
-
       if (!cls || !subj) return alert('กรุณาเลือกข้อมูลให้ครบถ้วน');
 
-      const myId = window.currentUser.teacherId || 't1';
-      setupContext(myId, window.currentUserProfile?.fullName || window.currentUser.displayName, window.currentUserProfile?.fullName || window.currentUser.displayName, subj, cls, [subj], year, term);
+      const myId = window.currentUser?.teacherId;
+      setupContext(
+        myId,
+        window.currentUserProfile?.fullName || window.currentUser?.displayName,
+        window.currentUserProfile?.fullName || window.currentUser?.displayName,
+        subj,
+        cls,
+        [subj],
+        year,
+        term
+      );
       renderForm();
     }
 
@@ -573,8 +527,10 @@
       const container = document.getElementById('teacherListContainer');
       container.innerHTML = '';
 
+      upsertLoggedInUserToTeachersDB();
+
       teachersDB.forEach(t => {
-        const currentSubjects = (t.schedule['2567'] && t.schedule['2567']['1']) ? t.schedule['2567']['1'] : [];
+        const currentSubjects = (t.schedule?.['2567'] && t.schedule?.['2567']?.['1']) ? t.schedule['2567']['1'] : [];
         container.innerHTML += `
           <div onclick="selectTeacher('${t.id}')" class="bg-white p-6 rounded-xl border hover:border-teal-500 cursor-pointer shadow-sm flex items-center gap-4">
             <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">👤</div>
@@ -595,8 +551,7 @@
       const list = document.getElementById('teacherSubjectList');
       list.innerHTML = '';
 
-      const subs = (window.tempTeacher.schedule['2567'] && window.tempTeacher.schedule['2567']['1']) ? window.tempTeacher.schedule['2567']['1'] : [];
-
+      const subs = (window.tempTeacher.schedule?.['2567'] && window.tempTeacher.schedule?.['2567']?.['1']) ? window.tempTeacher.schedule['2567']['1'] : [];
       if (subs.length === 0) {
         list.innerHTML = '<p class="text-center text-slate-400">ไม่มีวิชาสอนในเทอมนี้</p>';
       } else {
@@ -609,16 +564,15 @@
           }
         });
       }
-
       showPage('teamSubjectPage');
     }
 
     function confirmTeamSubject(sk) {
-      const allSubs = window.tempTeacher.schedule['2567']['1'];
+      const allSubs = window.tempTeacher.schedule?.['2567']?.['1'] || [];
       setupContext(
         window.tempTeacher.id,
         window.tempTeacher.name,
-        window.currentUserProfile?.fullName || window.currentUser.displayName,
+        window.currentUserProfile?.fullName || window.currentUser?.displayName,
         sk,
         'ไม่ระบุ',
         allSubs,
@@ -629,17 +583,7 @@
     }
 
     function setupContext(tid, tName, evName, subId, cls, allSubs, year, term) {
-      window.context = {
-        targetTeacherId: tid,
-        evaluateeName: tName,
-        evaluatorName: evName,
-        subjectId: subId,
-        classLevel: cls,
-        allSubjects: allSubs,
-        year: year,
-        term: term
-      };
-
+      window.context = { targetTeacherId: tid, evaluateeName: tName, evaluatorName: evName, subjectId: subId, classLevel: cls, allSubjects: allSubs, year, term };
       const dbKey = `${tid}_${subId}`;
       if (!window.mockDB[dbKey]) window.mockDB[dbKey] = {};
     }
@@ -715,44 +659,57 @@
           if (val === true) count++;
         }
       });
-
       document.getElementById('scoreSummary').innerText = `${count}/${sub.competencies.length}`;
     }
 
     function saveData() { alert('บันทึกข้อมูลเรียบร้อย!'); }
     function exitAssessment() { if (confirm('ต้องการยกเลิก?')) goBack('selectionPage'); }
-function clearAssessmentData() {
-  // เคลียร์ “วิชาที่กำลังเปิดอยู่” ของครูคนนั้น
-  const tid = window.context?.targetTeacherId;
-  const subId = window.context?.subjectId;
 
-  if (!tid || !subId) return alert('ไม่พบข้อมูลบริบทของแบบประเมิน');
+    function clearAssessmentData() {
+      const tid = window.context?.targetTeacherId;
+      const subId = window.context?.subjectId;
+      if (!tid || !subId) return alert('ไม่พบข้อมูลบริบทของแบบประเมิน');
 
-  const ok = confirm('ต้องการเคลียร์ผลการประเมินของวิชานี้ทั้งหมด (ทั้งตนเองและหัวหน้า) ใช่หรือไม่?');
-  if (!ok) return;
+      const ok = confirm('ต้องการเคลียร์ผลการประเมินของวิชานี้ทั้งหมด (ทั้งตนเองและหัวหน้า) ใช่หรือไม่?');
+      if (!ok) return;
 
-  const dbKey = `${tid}_${subId}`;
-  if (window.mockDB && window.mockDB[dbKey]) {
-    // ล้างทุก competency: ทั้ง self และ head
-    Object.keys(window.mockDB[dbKey]).forEach(cKey => {
-      if (!window.mockDB[dbKey][cKey]) return;
-      window.mockDB[dbKey][cKey].self = null;
-      window.mockDB[dbKey][cKey].head = null;
-    });
-  }
+      const dbKey = `${tid}_${subId}`;
+      if (window.mockDB && window.mockDB[dbKey]) {
+        Object.keys(window.mockDB[dbKey]).forEach(cKey => {
+          window.mockDB[dbKey][cKey].self = null;
+          window.mockDB[dbKey][cKey].head = null;
+        });
+      }
+      renderForm();
+      alert('เคลียร์ผลเรียบร้อยแล้ว');
+    }
 
-  // รีเฟรช UI
-  renderForm();
-  alert('เคลียร์ผลเรียบร้อยแล้ว');
-}
-
-    // --- EXPORT PDF ---
+    // EXPORT
     function openExportModal() {
       const select = document.getElementById('exportTeacherSelect');
       select.innerHTML = '<option value="">-- กรุณาเลือกครู --</option>';
-      teachersDB.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
+
+      upsertLoggedInUserToTeachersDB();
+
+      const myId = window.currentUser?.teacherId || window.currentUser?.uid;
+      const myName = window.currentUserProfile?.fullName || window.currentUser?.displayName || 'User';
+      const role = window.currentUserProfile?.role;
+
+      // ครูผู้สอน: เห็นเฉพาะตัวเอง
+      // หัวหน้า: เห็นทุกคน (รวมตัวเอง)
+      if (role === 'teacher') {
+        if (myId) select.innerHTML += `<option value="${myId}">${myName} (กำลังใช้งาน)</option>`;
+      } else {
+        if (myId) select.innerHTML += `<option value="${myId}">${myName} (กำลังใช้งาน)</option>`;
+        teachersDB.forEach(t => {
+          if (t.id === myId) return;
+          select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+        });
+      }
+
       document.getElementById('exportSelectModal').classList.remove('hidden');
     }
+
     function closeExportModal() { document.getElementById('exportSelectModal').classList.add('hidden'); }
 
     function confirmExportTeacher() {
@@ -761,11 +718,9 @@ function clearAssessmentData() {
 
       const tData = teachersDB.find(t => t.id === tid);
       let allSubjects = [];
-
-      Object.values(tData.schedule).forEach(yearObj => {
-        Object.values(yearObj).forEach(termArr => { allSubjects.push(...termArr); });
+      Object.values(tData.schedule || {}).forEach(yearObj => {
+        Object.values(yearObj || {}).forEach(termArr => { allSubjects.push(...termArr); });
       });
-
       allSubjects = [...new Set(allSubjects)];
 
       window.context = {
@@ -785,12 +740,10 @@ function clearAssessmentData() {
     function openPreview() {
       document.getElementById('prevEvaluatee').innerText = window.context.evaluateeName;
 
-      // แสดงตำแหน่งจากโปรไฟล์ (ถ้ามี)
       const role = window.currentUserProfile?.role;
       document.getElementById('prevPosition').innerText =
         role === 'teacher' ? 'ครูผู้สอน' :
-        role === 'head' ? 'ผู้ประเมิน (หัวหน้า)' :
-        '...';
+        role === 'head' ? 'ผู้ประเมิน (หัวหน้า)' : '...';
 
       document.getElementById('printDate').innerText = new Date().toLocaleDateString('th-TH');
 
@@ -811,6 +764,7 @@ function clearAssessmentData() {
               if (val === false) return '<span class="badge-fail">❌ ไม่ผ่าน</span>';
               return '<span class="badge-wait">⚪ ยังไม่ประเมิน</span>';
             };
+
             rows += `
               <tr class="border-b border-slate-100">
                 <td class="p-2 text-sm text-slate-700">${i + 1}. ${comp}</td>
