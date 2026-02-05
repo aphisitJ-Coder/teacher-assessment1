@@ -181,10 +181,29 @@
   <div id="teamSubjectPage" class="hidden min-h-screen flex flex-col items-center justify-center p-4">
     <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
       <button onclick="goBack('teamTeacherPage')" class="text-sm text-slate-400 mb-4">← เลือกครูใหม่</button>
+      
       <h2 class="text-xl font-bold text-slate-800 text-center mb-6" id="selectedTeacherName">...</h2>
-      <div class="bg-teal-50 p-4 rounded-lg mb-4 text-sm text-teal-800 border border-teal-200">
-        <p><strong>กำลังประเมิน:</strong> ปีการศึกษา 2567 / เทอม 1</p>
+
+      <div class="bg-teal-50 p-4 rounded-lg mb-6 border border-teal-200">
+        <p class="text-xs font-bold text-teal-800 mb-3">📌 เลือกช่วงเวลาการประเมิน:</p>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs text-teal-600 mb-1">ปีการศึกษา</label>
+                <select id="teamYearSelect" onchange="updateTeamSubjects()" class="w-full border border-teal-300 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <option value="2567">2567</option>
+                    <option value="2568">2568</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-teal-600 mb-1">เทอม</label>
+                <select id="teamTermSelect" onchange="updateTeamSubjects()" class="w-full border border-teal-300 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+        </div>
       </div>
+
       <div id="teacherSubjectList" class="space-y-3"></div>
     </div>
   </div>
@@ -294,6 +313,7 @@
   <script>
     window.currentUser = null;
     window.currentUserProfile = null;
+	window.isDemoMode = false;
 
     function showPage(pageId) {
       document.querySelectorAll('div[id$="Page"], div[id$="Modal"]').forEach(el => el.classList.add('hidden'));
@@ -353,27 +373,35 @@
     window.currentMode = '';
     window.mockDB = {}; // Mock DB for demo purpose
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.currentUser = user;
+   onAuthStateChanged(auth, (user) => {
+  // ✅ ถ้าอยู่โหมด Demo ไม่ต้องให้ Firebase มาควบคุมหน้า
+  if (window.isDemoMode) return;
 
-        // ใช้ uid เป็น teacherId (กันชนหลายคน)
-        window.currentUser.teacherId = user.uid;
+  if (user) {
+    window.currentUser = user;
 
-        const prof = loadProfile(user.uid);
-        window.currentUserProfile = prof;
+    // ใช้ uid เป็น teacherId
+    window.currentUser.teacherId = user.uid;
 
-        if (!prof) {
-          document.getElementById('profileFullName').value = user.displayName || '';
-          showPage('profilePage');
-        } else {
-          applyProfileToUI();
-          showPage('selectionPage');
-        }
-      } else {
-        showPage('authPage');
-      }
-    });
+    const prof = loadProfile(user.uid);
+    window.currentUserProfile = prof;
+
+    // ✅ สำคัญ: เพิ่มคนที่ login เข้า teachersDB ทันที
+    if (typeof upsertLoggedInUserToTeachersDB === 'function') {
+      upsertLoggedInUserToTeachersDB();
+    }
+
+    if (!prof) {
+      document.getElementById('profileFullName').value = user.displayName || '';
+      showPage('profilePage');
+    } else {
+      applyProfileToUI();
+      showPage('selectionPage');
+    }
+  } else {
+    showPage('authPage');
+  }
+});
 
     document.getElementById('googleLoginBtn').addEventListener('click', async () => {
       try { await signInWithPopup(auth, provider); }
@@ -549,44 +577,76 @@
       showPage('teamTeacherPage');
     }
 
-    function selectTeacher(tid) {
+   function selectTeacher(tid) {
       window.tempTeacher = teachersDB.find(x => x.id === tid);
       document.getElementById('selectedTeacherName').innerText = window.tempTeacher.name;
+      
+      // ตั้งค่าเริ่มต้น Dropdown เป็นปีปัจจุบัน
+      const yearSelect = document.getElementById('teamYearSelect');
+      const termSelect = document.getElementById('teamTermSelect');
+      
+      // เช็คก่อนว่ามี element นี้จริง (กัน Error ถ้าลืมแก้ HTML)
+      if (yearSelect && termSelect) {
+          yearSelect.value = '2567';
+          termSelect.value = '1';
+      }
 
+      updateTeamSubjects();
+      showPage('teamSubjectPage');
+    }
+
+    function updateTeamSubjects() {
+      const year = document.getElementById('teamYearSelect')?.value || '2567';
+      const term = document.getElementById('teamTermSelect')?.value || '1';
       const list = document.getElementById('teacherSubjectList');
-      list.innerHTML = '';
+      
+      list.innerHTML = ''; 
 
-      const subs = (window.tempTeacher.schedule?.['2567'] && window.tempTeacher.schedule?.['2567']?.['1']) ? window.tempTeacher.schedule['2567']['1'] : [];
+      // ดึงข้อมูลตารางสอน
+      const schedule = window.tempTeacher.schedule;
+      const subs = (schedule?.[year] && schedule?.[year]?.[term]) ? schedule[year][term] : [];
+
       if (subs.length === 0) {
-        list.innerHTML = '<p class="text-center text-slate-400">ไม่มีวิชาสอนในเทอมนี้</p>';
+        list.innerHTML = `
+            <div class="text-center py-8 text-slate-400 border-2 border-dashed rounded-lg bg-slate-50">
+                <div class="text-3xl mb-2">📭</div>
+                <p>ไม่พบรายวิชาสอน</p>
+                <p class="text-xs">ในปี ${year} เทอม ${term}</p>
+            </div>`;
       } else {
         subs.forEach(k => {
           if (subjectsDB[k]) {
             list.innerHTML += `
-              <button onclick="confirmTeamSubject('${k}')" class="w-full text-left bg-slate-50 p-4 rounded hover:bg-teal-50 border flex justify-between">
-                ${subjectsDB[k].name} <span>→</span>
+              <button onclick="confirmTeamSubject('${k}')" class="w-full text-left bg-white hover:bg-teal-50 p-4 rounded-xl border border-slate-200 hover:border-teal-400 shadow-sm flex justify-between items-center transition group">
+                <div>
+                    <div class="font-bold text-slate-700 group-hover:text-teal-700">${subjectsDB[k].name}</div>
+                    <div class="text-xs text-slate-400 mt-1">Deck: ${subjectsDB[k].assignedDeck}</div>
+                </div>
+                <span class="text-slate-300 group-hover:text-teal-500">→</span>
               </button>`;
           }
         });
       }
-      showPage('teamSubjectPage');
     }
 
     function confirmTeamSubject(sk) {
-      const allSubs = window.tempTeacher.schedule?.['2567']?.['1'] || [];
+      const year = document.getElementById('teamYearSelect')?.value || '2567';
+      const term = document.getElementById('teamTermSelect')?.value || '1';
+      
+      const allSubs = window.tempTeacher.schedule?.[year]?.[term] || [];
+
       setupContext(
         window.tempTeacher.id,
         window.tempTeacher.name,
         window.currentUserProfile?.fullName || window.currentUser?.displayName,
         sk,
-        'ไม่ระบุ',
+        subjectsDB[sk]?.assignedDeck || 'ไม่ระบุ',
         allSubs,
-        '2567',
-        '1'
+        year, 
+        term 
       );
       renderForm();
     }
-
     function setupContext(tid, tName, evName, subId, cls, allSubs, year, term) {
       window.context = { targetTeacherId: tid, evaluateeName: tName, evaluatorName: evName, subjectId: subId, classLevel: cls, allSubjects: allSubs, year, term };
       const dbKey = `${tid}_${subId}`;
@@ -815,13 +875,18 @@
     }
   </script>
 <script>
-  // ✅ DEMO MODE (ใช้ตอนเปิดแบบ file:/// หรือยังไม่อยาก Login)
+  // ... (ส่วนบนเหมือนเดิม)
+
+  // ✅ DEMO MODE
   document.addEventListener('DOMContentLoaded', () => {
     const demoBtn = document.getElementById('demoBtn');
     if (!demoBtn) return;
 
     demoBtn.addEventListener('click', () => {
-      // สร้าง user จำลอง
+      // 1. ตั้งค่า Flag ว่าเป็น Demo เพื่อหยุด Firebase Auth
+      window.isDemoMode = true; 
+
+      // 2. สร้าง user จำลอง
       window.currentUser = {
         uid: 'demo_user_001',
         email: 'demo@local',
@@ -829,25 +894,26 @@
         teacherId: 'demo_user_001'
       };
 
-      // สร้าง profile จำลอง
+      // 3. สร้าง profile จำลอง
       window.currentUserProfile = {
         fullName: 'Demo User',
-        role: 'teacher'   // เปลี่ยนเป็น 'head' ได้ ถ้าจะทดสอบโหมดหัวหน้า
+        role: 'teacher'   // ลองเปลี่ยนเป็น 'head' ตรงนี้ถ้าอยากเทสบทหัวหน้า
       };
 
-      // ใส่เข้า teachersDB
+      // 4. ใส่ข้อมูลเข้า Mock DB
       if (typeof upsertLoggedInUserToTeachersDB === 'function') {
         upsertLoggedInUserToTeachersDB();
       }
 
-      // แสดงชื่อบนหน้า selection
+      // 5. แสดงชื่อบนหน้า selection
       const ud = document.getElementById('userDisplay');
       if (ud) ud.innerText = window.currentUserProfile.fullName;
 
-      // ไปหน้า selection
+      // 6. เปลี่ยนหน้า
       if (typeof showPage === 'function') showPage('selectionPage');
     });
   });
+// ...
 </script>
 </body>
 </html>
