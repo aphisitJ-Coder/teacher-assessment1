@@ -433,10 +433,9 @@
       'AM-08-SCI': { name: 'AMCOL WAY 08 SCI', assignedDeck: 'DECK 4', competencies: ['Marine Technology', 'Signal Processing', 'Radio Communication Sci'] }
     };
 
-    // --- TEACHERS DB (demo only) ---
-    const teachersDB = [
-      { id: 't2', name: 'หัวหน้าหมวด (Demo)', schedule: { '2567': { '1': ['30000-1410', '30000-1411'] } } }
-    ];
+   // --- TEACHERS DB (demo only) ---
+    // ปล่อยว่างไว้ เพื่อให้แสดงเฉพาะคนที่ Login เข้ามาเท่านั้น
+    const teachersDB = [];
 
     // demo schedule for logged-in users (replace with real DB later)
     const demoScheduleForLoggedInUser = {
@@ -452,13 +451,17 @@
 
     function upsertLoggedInUserToTeachersDB() {
       if (!window.currentUser) return;
+      // ใช้ ID ของผู้ใช้ปัจจุบัน
       const tid = window.currentUser.teacherId || window.currentUser.uid;
+      // ใช้ชื่อจาก Profile ที่กรอก หรือชื่อจาก Google
       const name = window.currentUserProfile?.fullName || window.currentUser.displayName || 'User';
 
       let t = teachersDB.find(x => x.id === tid);
       if (!t) {
+        // ถ้ายังไม่มีในรายการ ให้เพิ่มเข้าไป
         teachersDB.push({ id: tid, name, schedule: demoScheduleForLoggedInUser });
       } else {
+        // ถ้ามีแล้ว ให้อัปเดตชื่อ (เผื่อมีการเปลี่ยนชื่อในหน้า Profile)
         t.name = name;
         if (!t.schedule || Object.keys(t.schedule).length === 0) t.schedule = demoScheduleForLoggedInUser;
       }
