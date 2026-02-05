@@ -37,6 +37,11 @@
         class="w-full flex items-center justify-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition">
         เข้าใช้งานด้วย Google
       </button>
+<button id="demoBtn"
+  class="w-full mt-3 flex items-center justify-center bg-slate-800 hover:bg-black text-white font-bold py-3 px-4 rounded-xl shadow-sm transition">
+  เข้าใช้งานโหมด Demo (ไม่ต้อง Login)
+</button>
+
 
       <div id="authMessage" class="mt-4 text-red-500 text-sm font-bold"></div>
     </div>
@@ -809,6 +814,40 @@
       html2pdf().set(opt).from(element).save();
     }
   </script>
+<script>
+  // ✅ DEMO MODE (ใช้ตอนเปิดแบบ file:/// หรือยังไม่อยาก Login)
+  document.addEventListener('DOMContentLoaded', () => {
+    const demoBtn = document.getElementById('demoBtn');
+    if (!demoBtn) return;
 
+    demoBtn.addEventListener('click', () => {
+      // สร้าง user จำลอง
+      window.currentUser = {
+        uid: 'demo_user_001',
+        email: 'demo@local',
+        displayName: 'Demo User',
+        teacherId: 'demo_user_001'
+      };
+
+      // สร้าง profile จำลอง
+      window.currentUserProfile = {
+        fullName: 'Demo User',
+        role: 'teacher'   // เปลี่ยนเป็น 'head' ได้ ถ้าจะทดสอบโหมดหัวหน้า
+      };
+
+      // ใส่เข้า teachersDB
+      if (typeof upsertLoggedInUserToTeachersDB === 'function') {
+        upsertLoggedInUserToTeachersDB();
+      }
+
+      // แสดงชื่อบนหน้า selection
+      const ud = document.getElementById('userDisplay');
+      if (ud) ud.innerText = window.currentUserProfile.fullName;
+
+      // ไปหน้า selection
+      if (typeof showPage === 'function') showPage('selectionPage');
+    });
+  });
+</script>
 </body>
 </html>
